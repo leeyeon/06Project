@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="CartMapper">
+	
+	<resultMap id="cartSelectMap"
+			   type="cart" >
+		<result property="cartNo" column="cart_no" jdbcType="INTEGER" />		
+		<result property="userId" column="user_id" jdbcType="VARCHAR"/>
+		<result property="prodNo" column="prod_no" jdbcType="INTEGER"/>
+		<result property="cartDate" column="cart_date" jdbcType="DATE"/>
+		<result property="status" column="status" jdbcType="CHAR"/>
+	</resultMap>
+
+	<insert id="addCart"
+			parameterType="cart">
+		INSERT
+		INTO cart
+		(cart_no, user_id, prod_no, cart_date, status)
+		VALUES
+		(seq_cart_cart_no.nextval, #{userId}, #{prodNo}, SYSDATE, '0')
+	</insert>
+	
+	<!-- 장바구니 있으면? check -->
+	<select id="checkCart"
+			parameterType="int"
+			resultType="int">
+		SELECT
+		count(*)
+		FROM cart
+		<where>
+			prod_no = ${value}
+			AND status = 0
+		</where>
+	</select>
+	
+	<select id="getCart"
+			parameterType="int"
+			resultMap="cartSelectMap">
+		SELECT
+		cart_no, user_id, prod_no, cart_date
+		FROM cart
+		<where>
+			cart_no = ${value}
+			AND status = 0
+		</where>
+	</select>
+
+</mapper>
