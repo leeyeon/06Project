@@ -112,18 +112,18 @@
 				</if>
 			</if>
 		</where>
-		ORDER BY tran_status_code NULLS FIRST, product.amount
+		ORDER BY
 		<if test="searchOrderbyPrice != null">
 			<if test="searchOrderbyPrice == 0 and searchOrderbyPrice !='' ">
-				, price DESC
+				price DESC, reg_date
 			</if>
 			<if test="searchOrderbyPrice == 1 and searchOrderbyPrice !='' ">
-				, price ASC
+				price ASC, reg_date
 			</if>
 		</if>
-		<if test="searchOrderbyPrice != null">
-			, product.prod_no
-		</if> 
+		<if test="searchOrderbyPrice == null or searchOrderbyPrice == ''">
+			reg_date
+		</if>
 	</sql>
 	
 	<!-- 상품개수 변경... 차후에 변경 -->

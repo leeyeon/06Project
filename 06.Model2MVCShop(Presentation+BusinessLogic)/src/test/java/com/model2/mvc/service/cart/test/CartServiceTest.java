@@ -1,6 +1,8 @@
 package com.model2.mvc.service.cart.test;
 
 import java.sql.Date;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.model2.mvc.common.Search;
 import com.model2.mvc.service.cart.CartService;
 import com.model2.mvc.service.domain.Cart;
 
@@ -38,8 +41,29 @@ public class CartServiceTest {
 	
 	}
 	
-	public void testGetCart() throws Exception {
-		 
+	//@Test
+	public void testGetCartList() throws Exception {
+		
+		Search search = new Search();
+	 	search.setCurrentPage(1);
+	 	search.setPageSize(3);
+	 	
+	 	Map<String,Object> map = cartService.getCartList(search, userId);
+	 	List<Cart> list =  (List<Cart>)map.get("list");
+	 	int totalCount = (int)map.get("totalCount");
+	 	
+	 	for (Cart cart : list) {
+			System.out.println(cart);
+		}
+	 	System.out.println("totalCount :: " +totalCount);
+	}
+	
+	@Test
+	public void testUpdateCartStatus() throws Exception {
+		
+		boolean result = cartService.updateCartStatus(cartNo);
+		
+		System.out.println("°á°ú:: "+result);
 	}
 
 }

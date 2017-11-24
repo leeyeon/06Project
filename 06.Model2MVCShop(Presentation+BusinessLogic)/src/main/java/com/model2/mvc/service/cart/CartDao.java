@@ -9,12 +9,12 @@ public interface CartDao {
 	
 	public int addCart(Cart cart) throws Exception;
 	
-	public Cart getCart(int cartNo) throws Exception;
-	
 	public List<Cart> getCartList(Search search, String userId) throws Exception;
 	
 	// 장바구니 취소!
 	public int updateCartStatus(int cartNo) throws Exception;
 	
 	public boolean checkCart(int prodNo) throws Exception;
+	
+	public int getTotalCount(Search search, String userId) throws Exception;
 }

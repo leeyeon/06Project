@@ -1,5 +1,9 @@
 package com.model2.mvc.web.purchase;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Map;
+
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +15,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.model2.mvc.common.Page;
 import com.model2.mvc.common.Search;
 import com.model2.mvc.service.domain.Product;
 import com.model2.mvc.service.domain.Purchase;
@@ -18,6 +23,7 @@ import com.model2.mvc.service.domain.User;
 import com.model2.mvc.service.product.ProductService;
 import com.model2.mvc.service.purchase.PurchaseService;
 import com.model2.mvc.service.user.UserService;
+import com.sun.istack.internal.Nullable;
 
 @Controller
 public class PurchaseController {
@@ -59,7 +65,6 @@ public class PurchaseController {
 	@RequestMapping("addPurchase.do")
 	public String addPurchase(@RequestParam("prodNo") int prodNo,
 							@RequestParam("buyerId") String buyerId,
-							@RequestParam("purchaseAmount") int purchaseAmount,
 							@ModelAttribute("purchase") Purchase purchase,
 							Model model) throws Exception {
 		
@@ -69,56 +74,159 @@ public class PurchaseController {
 		purchase.setBuyer(buyer);
 		purchase.setPurchaseProd(product);
 		
-		purchaseService.addPurchase(purchase);
-		
+		int result = purchaseService.addPurchase(purchase);
 		model.addAttribute("purchase", purchase);
 		
-		return "forward:/purchase/addPurchase.jsp?purchaseAmount="+purchaseAmount;
+		if(result == 1) {
+			return "forward:/purchase/addPurchase.jsp";
+		} else {
+			return null;
+		}
 	}
 	
 	@RequestMapping("getPurchase.do")
-	public String getPurchase() throws Exception {
+	public String getPurchase(@RequestParam("tranNo") int tranNo,
+							Model model) throws Exception {
 		
-		return null;
+		Purchase purchase = purchaseService.getPurchaseBytranNo(tranNo);
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+		Date date = dateFormat.parse(purchase.getDivyDate());
+		
+		System.out.println(date);
+		
+		purchase.setDivyDate((new SimpleDateFormat("YYYY-MM-DD")).format(date));
+		model.addAttribute("purchase", purchase);
+		
+		return "forward:/purchase/getPurchase.jsp";
 	}
 	
 	@RequestMapping("updatePurchaseView.do")
-	public String updatePurchaseView() throws Exception {
+	public String updatePurchaseView(@RequestParam("tranNo") int tranNo,
+									Model model) throws Exception {
 		
-		return null;
+		Purchase purchase = purchaseService.getPurchaseBytranNo(tranNo);
+		//System.out.println(purchase.getDivyDate());
+		
+		// yyyy-mm-dd hh:mm:ss -> YYYYMMDD
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+		Date date = dateFormat.parse(purchase.getDivyDate());
+		
+		System.out.println(date);
+		
+		purchase.setDivyDate((new SimpleDateFormat("YYYYMMDD")).format(date));
+		model.addAttribute("purchase", purchase);
+		
+		return "forward:/purchase/updatePurchase.jsp";
 	}
 	
 	@RequestMapping("updatePurchase.do")
-	public String updatePurchase() throws Exception {
+	public String updatePurchase(@RequestParam("tranNo") int tranNo,
+								@ModelAttribute("purchase") Purchase purchase) throws Exception {
 		
-		return null;
+		int result = purchaseService.updatePurchase(purchase);
+		
+		if(result == 1) {
+			return "redirect:/getPurchase.do?tranNo="+tranNo;
+		} else {
+			return null;
+		}
 	}
 	
 	@RequestMapping("listPurchase.do")
 	public String listPurchase(HttpSession session,
-							Search search)throws Exception {
+							@RequestParam(value="menu", required=false) String menu,
+							@RequestParam(value="currentPage", defaultValue="1") int currentPage,
+							@RequestParam(value="searchCondition", required=false) String searchCondition,
+							@RequestParam(value="searchKeyword", required=false) String searchKeyword,
+							@RequestParam(value="priceOrderbyCode", required=false) String priceOrderbyCode,
+							@ModelAttribute("search") @Nullable Search search,
+							Model model)throws Exception {
 		
 		String buyerId = ((User)session.getAttribute("user")).getUserId();
+		System.out.println(buyerId);
 		
-		return null;
+		search.setPageSize(pageSize);
+		search.setCurrentPage(currentPage);
+		search.setSearchCondition(searchCondition);
+		search.setSearchKeyword(searchKeyword);
+		search.setSearchOrderbyPrice(priceOrderbyCode);
+		
+		Map<String, Object> map = purchaseService.getPurchaseList(search, buyerId);
+		
+		Page resultPage	= 
+				new Page( currentPage, ((Integer)map.get("totalCount")).intValue(), 
+				pageUnit, pageSize);
+		
+		model.addAttribute("list", map.get("list"));
+		model.addAttribute("resultPage", resultPage);
+		model.addAttribute("search", search);
+		model.addAttribute("menu", menu);
+		
+		return "forward:/purchase/listPurchase.jsp";
 	}
 	
 	@RequestMapping("listSale.do")
-	public String listSale() throws Exception {
+	public String listSale(@RequestParam("menu") String menu,
+						@RequestParam(value="currentPage", defaultValue="1") int currentPage,
+						@RequestParam(value="searchCondition", required=false) String searchCondition,
+						@RequestParam(value="searchKeyword", required=false) String searchKeyword,
+						@RequestParam(value="priceOrderbyCode", required=false) String priceOrderbyCode,
+						@ModelAttribute("search") @Nullable Search search,
+						Model model) throws Exception {
 		
-		return null;
+		search.setPageSize(pageSize);
+		search.setCurrentPage(currentPage);
+		search.setSearchCondition(searchCondition);
+		search.setSearchKeyword(searchKeyword);
+		search.setSearchOrderbyPrice(priceOrderbyCode);
+		
+		Map<String, Object> map = purchaseService.getSaleList(search);
+		
+		Page resultPage	= 
+				new Page( currentPage, ((Integer)map.get("totalCount")).intValue(), 
+				pageUnit, pageSize);
+		
+		model.addAttribute("list", map.get("list"));
+		model.addAttribute("resultPage", resultPage);
+		model.addAttribute("search", search);
+		model.addAttribute("menu", menu);
+		
+		return "forward:/purchase/listSale.jsp";
 	}
 	
 	@RequestMapping("updateTranCode.do")
-	public String updateTranCode() throws Exception {
+	public String updateTranCode(@RequestParam("tranNo") int tranNo,
+								@RequestParam("tranCode") String tranCode) throws Exception {
 		
-		return null;
+		Purchase purchase = new Purchase();
+		purchase.setTranNo(tranNo);
+		purchase.setTranCode(tranCode);
+		
+		int result = purchaseService.updateTranCode(purchase);
+		if(result == 1) {
+			return "forward:/listPurchase.do";
+		} else {
+			return null;
+		}
 	}
 	
 	@RequestMapping("updateTranCodeByProd.do")
-	public String updateTranCodeByProd() throws Exception {
+	public String updateTranCodeByProd(@RequestParam("prodNo") int prodNo,
+									@RequestParam("tranCode") String tranCode) throws Exception {
 		
-		return null;
+		Purchase purchase = new Purchase();
+		Product product = new Product();
+		product.setProdNo(prodNo);
+		
+		purchase.setPurchaseProd(product);
+		purchase.setTranCode(tranCode);
+		
+		int result = purchaseService.updateTranCode(purchase);
+		if(result == 1) {
+			return "forward:/listProduct.do?menu=manage";
+		} else {
+			return null;
+		}
 	}
 
 }

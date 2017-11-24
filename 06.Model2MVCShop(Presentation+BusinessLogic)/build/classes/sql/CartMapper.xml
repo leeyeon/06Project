@@ -37,16 +37,44 @@
 		</where>
 	</select>
 	
-	<select id="getCart"
-			parameterType="int"
-			resultMap="cartSelectMap">
-		SELECT
-		cart_no, user_id, prod_no, cart_date
-		FROM cart
+	<update id="updateCartStatus"
+			parameterType="int">
+		UPDATE cart
+		<set>
+			status = 1
+		</set>
 		<where>
-			cart_no = ${value}
+			cart_no = #{value}
+		</where>
+	</update>
+	
+	<select id="getCartList"
+			parameterType="map"
+			resultMap="cartSelectMap">
+		SELECT *
+	  	FROM (	SELECT inner_table.* , ROWNUM AS row_seq
+				FROM	( <include refid="selectCartSql" /> ) inner_table
+				WHERE ROWNUM &lt;= #{search.endRowNum} )
+		WHERE row_seq BETWEEN #{search.startRowNum} AND #{search.endRowNum} 
+	</select>
+	
+	<select id="getTotalCount"
+			parameterType="map"
+			resultType="int">
+		SELECT COUNT(*)
+		FROM ( <include refid="selectCartSql" /> ) countTable
+	</select>
+	
+	<sql id="selectCartSql">
+		SELECT
+		cart_no, user_id, product.prod_no AS prod_no, prod_name,
+		cart_date
+		FROM cart, product
+		<where>
+			product.prod_no = cart.prod_no
+			AND user_id = #{userId}
 			AND status = 0
 		</where>
-	</select>
+	</sql>
 
 </mapper>

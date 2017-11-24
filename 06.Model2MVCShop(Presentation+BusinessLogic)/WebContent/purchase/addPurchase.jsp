@@ -31,7 +31,7 @@
 	</tr>
 	<tr>
 		<td>구매개수</td>
-		<td>${purchase.purchaseProd.amount}</td>
+		<td>${purchase.amount}</td>
 		<td></td>
 	</tr>
 	<tr>

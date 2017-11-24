@@ -116,7 +116,7 @@ function fncAddPurchase() {
 		<td width="104" class="ct_write">상품개수</td>
 		<td bgcolor="D6D6D6" width="1"></td>
 		<td class="ct_write01">
-			<select name="purchaseAmount" class="ct_input_g" 
+			<select name="amount" class="ct_input_g" 
 							style="width: 100px; height: 24px" maxLength="20">
 				<c:forEach var="i" begin="1" end="${(product.amount eq 0)? 1 : product.amount}">
 					<option value="${i}" ${(i eq 1)? "selected": ""} >${i}개</option>
@@ -167,7 +167,7 @@ function fncAddPurchase() {
 		<td width="104" class="ct_write">구매자주소</td>
 		<td bgcolor="D6D6D6" width="1"></td>
 		<td class="ct_write01">
-			<input 	type="text" name="receiverAddr" class="ct_input_g" 
+			<input 	type="text" name="divyAddr" class="ct_input_g" 
 							style="width: 100px; height: 19px" maxLength="20" 	value="${user.addr}" />
 		</td>
 	</tr>
@@ -178,7 +178,7 @@ function fncAddPurchase() {
 		<td width="104" class="ct_write">구매요청사항</td>
 		<td bgcolor="D6D6D6" width="1"></td>
 		<td class="ct_write01">
-			<input		type="text" name="receiverRequest" 	class="ct_input_g" 
+			<input		type="text" name="divyRequest" 	class="ct_input_g" 
 							style="width: 100px; height: 19px" maxLength="20" />
 		</td>
 	</tr>
@@ -189,10 +189,10 @@ function fncAddPurchase() {
 		<td width="104" class="ct_write">배송희망일자</td>
 		<td bgcolor="D6D6D6" width="1"></td>
 		<td width="200" class="ct_write01">
-			<input 	type="text" readonly="readonly" name="receiverDate" class="ct_input_g" 
+			<input 	type="text" readonly="readonly" name="divyDate" class="ct_input_g" 
 							style="width: 100px; height: 19px" maxLength="20"/>
 			<img 	src="../images/ct_icon_date.gif" width="15" height="15"	
-						onclick="show_calendar('document.addPurchase.receiverDate', document.addPurchase.receiverDate.value)"/>
+						onclick="show_calendar('document.addPurchase.divyDate', document.addPurchase.divyDate.value)"/>
 		</td>
 	</tr>
 	<tr>

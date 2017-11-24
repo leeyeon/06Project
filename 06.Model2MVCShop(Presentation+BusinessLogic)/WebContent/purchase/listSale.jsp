@@ -45,14 +45,6 @@
 		전체 ${resultPage.totalCount} 건수, 현재 ${resultPage.currentPage} 페이지</td>
 	</tr>
 	<tr>
-		<td colspan="13" align="right">
-		<a href="">상품명순</a>&nbsp;&nbsp;
-		<a href="">재고순</a>&nbsp;&nbsp;
-		<a href="">상품등록일순</a>
-		</td>
-	</tr>
-	<tr><td>&nbsp;</td></tr>
-	<tr>
 		<td colspan="13" bgcolor="808285" height="1"></td>
 	</tr>
 	<tr>
@@ -120,39 +112,23 @@
 			<td align="right"><fmt:formatNumber value="${product.price}" pattern="#,###"/> 원</td>
 			<td></td>
 			<td align="center">
-				<c:if test="${product.amount == 0}">
-					품절
-				</c:if>	
-				<c:if test="${product.amount != 0}">
-					${product.amount}&nbsp;개
-				</c:if>
+				${purchase.amount}&nbsp;개
 			</td>
 			<td></td>
 			<td align="center">${purchase.buyer.userId}</td>
 			<td></td>
 			<td align="left">
+
+			<c:choose>
+				<c:when test="${purchase.tranCode.trim() eq '1'}">구매완료</c:when>
+				<c:when test="${purchase.tranCode.trim() eq '2'}">배송중</c:when>
+			<c:otherwise>배송완료</c:otherwise>
 			
-			<c:if test="${empty product.proTranCode}">
-				판매중
+			</c:choose>
+			<c:if test="${purchase.tranCode.trim() eq '1' && menu eq 'sale' }">
+				<a href="/updateTranCodeByProd.do?prodNo=${product.prodNo}&tranCode=2">배송하기</a>
 			</c:if>
-			<c:if test="${!empty product.proTranCode }">
-				<c:if test="${product.amount == 0}">
-					재고없음
-				</c:if>
-				<c:choose>
-					<c:when test="${!empty user && user.role.trim() eq 'admin'}">
-						<c:choose>
-						<c:when test="${product.proTranCode.trim() eq '1'}">구매완료</c:when>
-						<c:when test="${product.proTranCode.trim() eq '2'}">배송중</c:when>
-						<c:otherwise>배송완료</c:otherwise>
-						
-						</c:choose>
-						<c:if test="${product.proTranCode.trim() eq '1' && menu eq 'sale' }">
-							<a href="/updateTranCodeByProd.do?prodNo=${product.prodNo}&tranCode=2">배송하기</a>
-						</c:if>
-					</c:when>
-				</c:choose>
-			</c:if>
+			
 			</td>
 		</tr>
 		<tr>

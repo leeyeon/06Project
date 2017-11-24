@@ -1,6 +1,8 @@
 package com.model2.mvc.service.cart.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -34,21 +36,29 @@ public class CartServiceImpl implements CartService {
 	}
 
 	@Override
-	public Cart getCart(int cartNo) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public Map<String, Object> getCartList(Search search, String userId) throws Exception {
+		
+		List<Cart> list = cartDao.getCartList(search, userId);
+		
+		int totalCount = cartDao.getTotalCount(search, userId);
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("list", list);
+		map.put("totalCount", totalCount);
+		
+		return map;
 	}
 
 	@Override
-	public List<Cart> getCartList(Search search, String userId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int updateCartStatus(int cartNo) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
+	public boolean updateCartStatus(int cartNo) throws Exception {
+		
+		int result = cartDao.updateCartStatus(cartNo);
+		
+		if(result == 1) {
+			return true; 
+		}
+		
+		return false;
 	}
 
 }

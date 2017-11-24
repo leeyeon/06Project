@@ -1,6 +1,8 @@
 package com.model2.mvc.service.cart.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,20 +30,17 @@ public class CartDaoImpl implements CartDao {
 	}
 
 	@Override
-	public Cart getCart(int cartNo) throws Exception {
-		return sqlSession.selectOne("CartMapper.getCart", cartNo);
-	}
-
-	@Override
 	public List<Cart> getCartList(Search search, String userId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("search", search);
+		map.put("userId", userId);
+		
+		return sqlSession.selectList("CartMapper.getCartList",map);
 	}
 
 	@Override
 	public int updateCartStatus(int cartNo) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
+		return sqlSession.update("CartMapper.updateCartStatus", cartNo);
 	}
 
 	@Override
@@ -51,6 +50,15 @@ public class CartDaoImpl implements CartDao {
 		} else {
 			return false;
 		}
+	}
+
+	@Override
+	public int getTotalCount(Search search, String userId) throws Exception {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("search", search);
+		map.put("userId", userId);
+		
+		return sqlSession.selectOne("CartMapper.getTotalCount", map);
 	}
 
 }

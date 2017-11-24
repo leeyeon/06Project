@@ -20,6 +20,8 @@
 		<result property="orderDate" column="order_date" jdbcType="DATE" />
 		<result property="buyer.userId" column="buyer_id" jdbcType="VARCHAR"/>
 		<result property="purchaseProd.prodNo" column="prod_no" jdbcType="INTEGER"/>
+		<result property="purchaseProd.price" column="price" jdbcType="INTEGER"/>
+		<result property="price" column="total_price" jdbcType="NUMERIC"/>
 		<!-- <association property="purchaseProd" resultMap="productSelectMap"/> -->
 	</resultMap>
 	
@@ -68,12 +70,14 @@
 			parameterType="int"
 			resultMap="purchaseSelectMap">
 		SELECT
-		transaction.tran_no AS tran_no, prod_no, 
+		transaction.tran_no AS tran_no, product.prod_no AS prod_no, 
+		price*inventory.amount AS total_price, price,
 		buyer_id, payment_option, receiver_name, receiver_phone,
-		dlvy_addr, dlvy_request, dlvy_date, amount, tran_status_code, order_date
-		FROM transaction, inventory
+		dlvy_addr, dlvy_request, dlvy_date, inventory.amount AS amount, tran_status_code, order_date
+		FROM product, transaction, inventory
 		<where> 
-			transaction.tran_no = inventory.tran_no
+			product.prod_no = transaction.prod_no
+			AND transaction.tran_no = inventory.tran_no
 			AND transaction.tran_no = ${value}
 		</where>
 	</select>
@@ -150,36 +154,40 @@
 	
 	<sql id="selectSaleSql">
 		SELECT
-		transaction.amount AS amount, tran_status_code, product.prod_no AS prod_no,
-		user_id, prod_name, price, image_file, product.reg_date AS reg_date
-		FROM product, transaction, users
+		inventory.amount AS amount, tran_status_code, product.prod_no AS prod_no,
+		buyer_id, prod_name, price, image_file, product.reg_date AS reg_date
+		FROM product, transaction, inventory
 		<where>
 			product.prod_no = transaction.prod_no(+)
-			AND transaction.buyer_id = users.user_id
-			AND role = 'user'
+			AND transaction.tran_no = inventory.tran_no
 		</where>
-		ORDER BY tran_status_code NULLS FIRST
+		ORDER BY 
 		<if test="search.searchOrderbyPrice != null">
 			<if test="search.searchOrderbyPrice == 0 and search.searchOrderbyPrice !='' ">
-				, price DESC
+				price DESC, reg_date
 			</if>
 			<if test="search.searchOrderbyPrice == 1 and search.searchOrderbyPrice !='' ">
-				, price ASC
+				price ASC, reg_date
 			</if>
+		</if>
+		<if test="searchOrderbyPrice == null">
+			reg_date
 		</if>
 	</sql>
 	
 	<sql id="selectPurchaseSql">
 		SELECT
 		DISTINCT
-		tran_no, transaction.prod_no AS prod_no, buyer_id
+		transaction.tran_no, transaction.prod_no AS prod_no, inventory.amount AS amount,
+		price*inventory.amount AS total_price, price,  transaction.order_date,
 		receiver_name, receiver_phone, tran_status_code
-		FROM transaction, product
+		FROM transaction, product, inventory
 		<where>
 			transaction.prod_no = product.prod_no
+			AND transaction.tran_no = inventory.tran_no
 			AND buyer_id = #{buyerId}
 		</where>
-		ORDER BY tran_no
+		ORDER BY transaction.order_date
 	</sql>
 	
 	<select id="checkPurchase"

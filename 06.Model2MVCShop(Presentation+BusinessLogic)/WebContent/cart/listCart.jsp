@@ -5,7 +5,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
 <head>
-<title>구매 목록조회</title>
+<title>장바구니</title>
 
 <link rel="stylesheet" href="/css/admin.css" type="text/css">
 
@@ -15,7 +15,7 @@
 
 <div style="width: 98%; margin-left: 10px;">
 
-<form name="detailForm" action="/listPurchase.do" method="post">
+<form name="detailForm" action="/lisCart.do" method="post">
 
 <table width="100%" height="37" border="0" cellpadding="0"	cellspacing="0">
 	<tr>
@@ -23,7 +23,7 @@
 		<td background="/images/ct_ttl_img02.gif" width="100%" style="padding-left: 10px;">
 			<table width="100%" border="0" cellspacing="0" cellpadding="0">
 				<tr>
-					<td width="93%" class="ct_ttl01">구매 목록조회</td>
+					<td width="93%" class="ct_ttl01">장바구니</td>
 				</tr>
 			</table>
 		</td>
@@ -52,17 +52,16 @@
 	<tr>
 		<td colspan="11" bgcolor="808285" height="1"></td>
 	</tr>
-	<c:forEach var="purchase" items="${list}">
+	<c:forEach var="cart" items="${list}">
 	<tr class="ct_list_pop">
 		<td align="center">
-			<a href="/getPurchase.do?tranNo=${purchase.tranNo}">
-			${list.indexOf(purchase) + 1}</a>
+			<a href="/getProduct.do?prodNo=${cart_prodNo}">
+			${list.indexOf(cart) + 1}</a>
 		</td>
 		<td></td>
 		<td align="center">
-			<a href="/getProduct.do?prodNo=${purchase.purchaseProd.prodNo}&menu=${menu}">
-			${purchase.purchaseProd.prodName}
-		</a>
+			<a href="/getProduct.do?prodNo=${cart_prodNo}">
+			${cart.}</a>
 		</td>
 		<td></td>
 		<td align="left"><fmt:formatNumber value="${purchase.price}" pattern="#,###"/>원 ( ${purchase.amount} )</td>

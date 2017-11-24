@@ -51,15 +51,18 @@ public class ProductController {
 		
 		product.setManuDate(product.getManuDate().replaceAll("-", "").trim());
 		
-		productService.addProduct(product);
+		int result = productService.addProduct(product);
 		
-		return "forward:/product/addProductView.jsp";
-		
+		if(result == 1) {
+			return "forward:/product/addProductView.jsp";
+		} else {
+			return null;
+		}
 	}
 	
 	@RequestMapping("/getProduct.do")
 	public String getProduct(@RequestParam("prodNo") int prodNo,
-							@RequestParam("menu") String menu,
+							@RequestParam(value="menu", required=false) String menu,
 							@CookieValue(value="history", required=false) String history,
 							HttpServletResponse response,
 							Model model) throws Exception  {
@@ -118,14 +121,18 @@ public class ProductController {
 		//product.setProdNo(prodNo);
 		product.setManuDate(product.getManuDate().replaceAll("-", "").trim());
 		
-		productService.updateProduct(product);
+		int result = productService.updateProduct(product);
 		
 		System.out.println("updateProduct.do prodNo:: "+product.getProdNo());
 		System.out.println("updateProduct.do menu:: "+menu);
 		
 		// prodNo 이 자동으로 넘어가는 이유?
 		
-		return "forward:/getProduct.do?menu="+menu;
+		if(result == 1) {
+			return "forward:/getProduct.do?menu="+menu;
+		} else {
+			return null;
+		}
 	}
 	
 	@RequestMapping("/listProduct.do")
@@ -136,6 +143,9 @@ public class ProductController {
 							@RequestParam(value="priceOrderbyCode", required=false) String priceOrderbyCode,
 							@ModelAttribute("search") @Nullable Search search,
 							Model model) throws Exception  {
+		
+		System.out.println("menu :: " +menu);
+		System.out.println("가격정렬 Test :: "+priceOrderbyCode);
 		
 		search.setPageSize(pageSize);
 		search.setCurrentPage(currentPage);
